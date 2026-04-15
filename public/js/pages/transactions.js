@@ -1,10 +1,96 @@
 // ======================== TRANSACTIONS PAGE ========================
+import { auth } from '../firebase/auth.js';
+import { getUserIncomes, getUserExpenses, addUserIncome, addUserExpense, deleteIncome, deleteExpense } from '../api/mymoney.js';
+import { formatCurrency, formatDate, getTransactionIcon, getDeleteIcon } from '../modules/helpers.js';
+import { categories } from '../modules/transactions.js';
+
+let transactions = [];
+let currentUser = null;
+
 document.addEventListener('DOMContentLoaded', function () {
-    loadTransactions();
-    initializeTransactionForm();
-    initializeFilters();
-    updateTransactionsTable();
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            console.log('User logged in:', currentUser.email);
+            await loadTransactionsFromAPI();
+            initializeTransactionForm();
+            initializeFilters();
+            updateTransactionsTable();
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
 });
+
+async function loadTransactionsFromAPI() {
+    const userEmail = currentUser.email;
+    const userName = userEmail.split('@')[0];
+    console.log('Loading transactions for user:', userName);
+    
+    try {
+        const incomesResult = await getUserIncomes(userEmail);
+        const expensesResult = await getUserExpenses(userEmail);
+        
+        console.log('Incomes result:', incomesResult);
+        console.log('Expenses result:', expensesResult);
+        
+        const incomes = (incomesResult.success && incomesResult.data ? incomesResult.data : []).map(inc => ({
+            id: inc._id,
+            type: 'income',
+            amount: inc.amount,
+            category: inc.category || 'Salary',
+            description: inc.description,
+            date: inc.date.split('T')[0],
+            method: 'API'
+        }));
+        
+        const expenses = (expensesResult.success && expensesResult.data ? expensesResult.data : []).map(exp => ({
+            id: exp._id,
+            type: 'expense',
+            amount: exp.amount,
+            category: exp.category || 'Other',
+            description: exp.description,
+            date: exp.date.split('T')[0],
+            method: 'API'
+        }));
+        
+        transactions = [...incomes, ...expenses];
+        transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        console.log(`Loaded ${transactions.length} transactions for user ${userName}`);
+        console.log('Transactions:', transactions);
+        
+    } catch (error) {
+        console.error('Error loading transactions:', error);
+        transactions = [];
+    }
+}
+
+async function addTransactionToAPI(transaction) {
+    const userEmail = currentUser.email;
+    console.log('Adding transaction for user:', userEmail);
+    console.log('Transaction data:', transaction);
+    
+    let result;
+    
+    if (transaction.type === 'income') {
+        result = await addUserIncome(userEmail, transaction);
+    } else {
+        result = await addUserExpense(userEmail, transaction);
+    }
+    
+    console.log('API result:', result);
+    
+    if (result.success) {
+        console.log('Transaction added successfully, reloading...');
+        await loadTransactionsFromAPI(); // Recarregar dados
+        return true;
+    } else {
+        console.error('Failed to add transaction:', result.error);
+        alert('Error adding transaction: ' + result.error);
+        return false;
+    }
+}
 
 function initializeTransactionForm() {
     const addBtn = document.getElementById('add-transaction-btn');
@@ -14,24 +100,32 @@ function initializeTransactionForm() {
     const typeSelect = document.getElementById('transaction-type');
     const dateInput = document.getElementById('transaction-date');
 
+    if (!addBtn) {
+        console.error('Add button not found!');
+        return;
+    }
+
     dateInput.value = new Date().toISOString().split('T')[0];
 
     typeSelect.addEventListener('change', updateCategoryOptions);
     updateCategoryOptions();
 
     addBtn.addEventListener('click', function () {
+        console.log('Add button clicked');
         formContainer.style.display = 'block';
     });
 
     cancelBtn.addEventListener('click', function () {
+        console.log('Cancel button clicked');
         formContainer.style.display = 'none';
         form.reset();
         dateInput.value = new Date().toISOString().split('T')[0];
         updateCategoryOptions();
     });
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
+        console.log('Form submitted');
 
         const transaction = {
             type: document.getElementById('transaction-type').value,
@@ -42,14 +136,27 @@ function initializeTransactionForm() {
             description: document.getElementById('transaction-description').value
         };
 
-        addTransaction(transaction);
-        updateTransactionsTable();
-        updateFilterCategories();
+        console.log('Transaction to add:', transaction);
 
-        formContainer.style.display = 'none';
-        form.reset();
-        dateInput.value = new Date().toISOString().split('T')[0];
-        updateCategoryOptions();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Saving...';
+        submitBtn.disabled = true;
+
+        const success = await addTransactionToAPI(transaction);
+        
+        if (success) {
+            console.log('Updating UI after successful add');
+            updateTransactionsTable();  // Atualizar tabela
+            updateFilterCategories();   // Atualizar filtros
+            formContainer.style.display = 'none';
+            form.reset();
+            dateInput.value = new Date().toISOString().split('T')[0];
+            updateCategoryOptions();
+        }
+        
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     });
 }
 
@@ -92,6 +199,8 @@ function updateFilterCategories() {
 }
 
 function updateTransactionsTable() {
+    console.log('Updating transactions table, total transactions:', transactions.length);
+    
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
     const filterType = document.getElementById('filter-type').value;
     const filterCategory = document.getElementById('filter-category').value;
@@ -104,6 +213,8 @@ function updateTransactionsTable() {
         const matchesCategory = filterCategory === 'all' || t.category === filterCategory;
         return matchesSearch && matchesType && matchesCategory;
     });
+
+    console.log('Filtered transactions:', filtered.length);
 
     const tbody = document.getElementById('transactions-table-body');
 
@@ -120,18 +231,42 @@ function updateTransactionsTable() {
                 <td class="text-right ${t.type === 'income' ? 'green' : 'red'}">
                     ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
                 </td>
-                <td class="text-center"><button class="delete-btn" onclick="handleDelete('${t.id}')">${getDeleteIcon()}</button></td>
+                <td class="text-center"><button class="delete-btn" data-id="${t.id}" data-type="${t.type}">${getDeleteIcon()}</button></td>
             </tr>
         `).join('');
     }
 
     document.getElementById('transactions-count').textContent = `Showing ${filtered.length} of ${transactions.length} transactions`;
+    
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const id = this.getAttribute('data-id');
+            const type = this.getAttribute('data-type');
+            
+            if (confirm('Are you sure you want to delete this transaction?')) {
+                await deleteTransactionFromAPI(id, type);
+                updateTransactionsTable();
+                updateFilterCategories();
+            }
+        });
+    });
 }
 
-window.handleDelete = function (id) {
-    if (confirm('Are you sure you want to delete this transaction?')) {
-        deleteTransaction(id);
-        updateTransactionsTable();
-        updateFilterCategories();
+async function deleteTransactionFromAPI(id, type) {
+    let result;
+    
+    if (type === 'income') {
+        result = await deleteIncome(id);
+    } else {
+        result = await deleteExpense(id);
     }
-};
+    
+    if (result.success) {
+        await loadTransactionsFromAPI();
+        return true;
+    } else {
+        console.error('Failed to delete:', result.error);
+        alert('Error deleting: ' + result.error);
+        return false;
+    }
+}

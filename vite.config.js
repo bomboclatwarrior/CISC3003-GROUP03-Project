@@ -5,6 +5,17 @@ export default defineConfig({
   envDir: '../',
   server: {
     port: 5173,
-    open: true
+    open: true,
+    proxy: {
+      '/api': {
+        target: 'https://my-money-budget.vercel.app',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        secure: true,
+        headers: {
+          'Access-Control-Allow-Origin': '*'
+        }
+      }
+    }
   }
 });

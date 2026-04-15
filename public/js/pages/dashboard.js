@@ -1,9 +1,87 @@
 // ======================== DASHBOARD PAGE ========================
+import { auth } from '../firebase/auth.js';
+import { getUserIncomes, getUserExpenses } from '../api/mymoney.js';
+import { formatCurrency, formatDate, getTransactionIcon } from '../modules/helpers.js';
+
+let transactions = [];
+let currentUser = null;
+
 document.addEventListener('DOMContentLoaded', function () {
-    loadTransactions();
-    updateDashboard();
+    // Aguardar o Firebase carregar o usuário
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            await loadTransactionsFromAPI();
+            updateDashboard();
+        } else {
+            // Usuário não logado - redirecionar
+            window.location.href = 'login.html';
+        }
+    });
 });
 
+// NOVA FUNÇÃO: Carregar transações da API filtradas por usuário
+async function loadTransactionsFromAPI() {
+    const userEmail = currentUser.email;
+    const userName = userEmail.split('@')[0];
+    
+    // Mostrar loading nos cards
+    showLoading();
+    
+    try {
+        // Buscar incomes e expenses da API
+        const incomesResult = await getUserIncomes(userEmail);
+        const expensesResult = await getUserExpenses(userEmail);
+        
+        // Processar incomes
+        const incomes = (incomesResult.success ? incomesResult.data : []).map(inc => ({
+            id: inc._id,
+            type: 'income',
+            amount: inc.amount,
+            category: inc.category || 'Salary',
+            description: inc.description,
+            date: inc.date.split('T')[0], // Formato YYYY-MM-DD
+            method: 'API'
+        }));
+        
+        // Processar expenses
+        const expenses = (expensesResult.success ? expensesResult.data : []).map(exp => ({
+            id: exp._id,
+            type: 'expense',
+            amount: exp.amount,
+            category: exp.category || 'Other',
+            description: exp.description,
+            date: exp.date.split('T')[0],
+            method: 'API'
+        }));
+        
+        // Combinar e ordenar por data (mais recente primeiro)
+        transactions = [...incomes, ...expenses];
+        transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        console.log(`Loaded ${transactions.length} transactions for user: ${userName}`);
+        
+    } catch (error) {
+        console.error('Error loading transactions:', error);
+        transactions = [];
+    }
+    
+    hideLoading();
+}
+
+function showLoading() {
+    const elements = ['total-balance', 'total-income', 'total-expenses'];
+    elements.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = 'Loading...';
+    });
+}
+
+function hideLoading() {
+    // O updateDashboard vai preencher os dados
+}
+
+// SUA FUNÇÃO ORIGINAL - NÃO MUDA!
 function updateDashboard() {
     const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
     const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
@@ -37,6 +115,7 @@ function updateDashboard() {
     updateRecentTransactions();
 }
 
+// SUA FUNÇÃO ORIGINAL - NÃO MUDA!
 function updateRecentTransactions() {
     const container = document.getElementById('recent-transactions');
     const recent = transactions.slice(0, 5);
