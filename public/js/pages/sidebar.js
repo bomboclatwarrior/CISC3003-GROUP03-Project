@@ -1,11 +1,32 @@
-// ======================== SIDEBAR COMPONENT ========================
-document.addEventListener('DOMContentLoaded', function () {
-    // Check authentication
-    if (!checkAuth()) return;
+import { getCurrentUser, signOut, onAuthChange } from '../firebase/auth.js';
 
-    // Load sidebar HTML
+function initializeMobileMenu() {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+
+    if (!menuBtn || !sidebar) return;
+
+    menuBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('active');
+    });
+
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
     const sidebarContainer = document.getElementById('sidebar-container');
-    if (sidebarContainer) {
+    if (!sidebarContainer) return;
+
+    // Aguardar estado do auth antes de renderizar sidebar
+    onAuthChange((user) => {
+        if (!user) return; // não renderiza sidebar se não estiver logado
         const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
         
         sidebarContainer.innerHTML = `
@@ -19,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     </div>
                 </div>
-
                 <nav class="sidebar-nav">
                     <p class="nav-label">MENU</p>
                     <a href="dashboard.html" class="nav-item ${currentPage === 'dashboard' ? 'active' : ''}">
@@ -43,11 +63,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span>Help & Tips</span>
                     </a>
                 </nav>
-
                 <div class="sidebar-footer">
                     <div class="sidebar-user-info">
-                        <p class="user-name">${currentUser.name}</p>
-                        <p class="user-email">${currentUser.email}</p>
+                        <p class="user-name">${user.displayName || 'Usuário'}</p>
+                        <p class="user-email">${user.email}</p>
                     </div>
                     <button class="nav-item signout-btn" id="signout-btn">
                         <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
@@ -55,37 +74,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     </button>
                 </div>
             </aside>
-
-            <!-- Mobile Menu Button -->
             <button class="mobile-menu-btn" id="mobile-menu-btn">
                 <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
         `;
 
-        // Setup signout button
-        document.getElementById('signout-btn').addEventListener('click', signOut);
-
-        // Setup mobile menu
+        document.getElementById('signout-btn')?.addEventListener('click', signOut);
         initializeMobileMenu();
-    }
+    });
 });
-
-function initializeMobileMenu() {
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const sidebar = document.getElementById('sidebar');
-
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'sidebar-overlay';
-    document.body.appendChild(overlay);
-
-    menuBtn.addEventListener('click', function () {
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('active');
-    });
-
-    overlay.addEventListener('click', function () {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-    });
-}
