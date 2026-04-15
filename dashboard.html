@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Finomic</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/app-layout.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Include Sidebar -->
+        <div id="sidebar-container"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h2>Welcome back!</h2>
+                    <p>Here's your financial overview</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card gradient">
+                    <div class="stat-header">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <p>Total Balance</p>
+                    </div>
+                    <h3 id="total-balance">$0.00</h3>
+                    <p class="stat-date" id="current-month">Loading...</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <svg class="icon green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                        <p>Total Income</p>
+                    </div>
+                    <h3 id="total-income">$0.00</h3>
+                    <p class="stat-info green" id="income-count">0 transactions</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <svg class="icon red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
+                        <p>Total Expenses</p>
+                    </div>
+                    <h3 id="total-expenses">$0.00</h3>
+                    <p class="stat-info red" id="expense-count">0 transactions</p>
+                </div>
+            </div>
+
+            <div class="overview-grid">
+                <div class="card">
+                    <h4>Overview</h4>
+                    <div class="overview-stats">
+                        <div class="overview-item">
+                            <div class="overview-circle teal"><span id="total-transactions">0</span></div>
+                            <p>Transactions</p>
+                        </div>
+                        <div class="overview-item">
+                            <div class="overview-circle green"><span id="income-transactions">0</span></div>
+                            <p>Income</p>
+                        </div>
+                        <div class="overview-item">
+                            <div class="overview-circle red"><span id="expense-transactions">0</span></div>
+                            <p>Expenses</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4>Financial Health</h4>
+                    <div class="health-stats">
+                        <div class="health-item">
+                            <div class="health-header">
+                                <span>Savings Rate</span>
+                                <span class="teal" id="savings-rate">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill gradient" id="savings-progress"></div>
+                            </div>
+                        </div>
+                        <div class="health-item">
+                            <div class="health-header">
+                                <span>Expense Ratio</span>
+                                <span class="red" id="expense-ratio">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill red" id="expense-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4>Recent Transactions</h4>
+                <div id="recent-transactions" class="transactions-list"></div>
+            </div>
+            <!-- Page Footer -->
+            <footer class="page-footer">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h4>CISC3003 Web Programming</h4>
+                        <p>Financial Assistant Dashboard - Group 03</p>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Team Members</h4>
+                        <p>Tatiana Muniz Rodriguez (DC02702-1) • Diogo Barros (DC328252) • LIN CHO KIO, Diana (DC325411) • Effy • Edith (DC328581)</p>
+                    </div>
+                    <div class="footer-section">
+                        <p class="footer-copy">© 2026 Finomic. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

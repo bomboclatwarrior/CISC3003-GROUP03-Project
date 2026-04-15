@@ -1,0 +1,129 @@
+/* ======================== HELP PAGE STYLES ======================== */
+.gradient-card {
+    background: linear-gradient(to bottom right, #10b981, #06b6d4);
+}
+
+.gradient-card h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+}
+
+.about-desc {
+    font-size: 18px;
+    margin-bottom: 16px;
+    opacity: 0.9;
+}
+
+.about-text {
+    opacity: 0.8;
+}
+
+.section-title {
+    font-size: 20px;
+    margin: 32px 0 24px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.tip-card {
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 24px;
+    transition: border-color 0.2s;
+}
+
+.tip-card:hover {
+    border-color: #374151;
+}
+
+.tip-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 24px;
+}
+
+.tip-card h4 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.tip-card p {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.step {
+    display: flex;
+    gap: 16px;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    background-color: #10b981;
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.step-content h5 {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.step-content p {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.dark-card {
+    background-color: #0a0a0a;
+}
+
+.small-title {
+    font-size: 14px;
+    color: #9ca3af;
+    margin-bottom: 8px;
+}
+
+.small-text {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .features-grid,
+    .tips-grid {
+        grid-template-columns: 1fr;
+    }
+}
