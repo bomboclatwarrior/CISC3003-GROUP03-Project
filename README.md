@@ -44,57 +44,57 @@ Project/
     └── reports.js            # Reports page logic
 ```
 
-## 🚀 Features
+## Features
 
 ### Authentication System
-- ✅ User login
-- ✅ User signup
-- ✅ Email verification (OTP)
-- ✅ Forgot password
-- ✅ Password reset
+- User login
+- User signup
+- Email verification (OTP)
+- Forgot password
+- Password reset
 
 ### Dashboard Features
-- ✅ Total balance overview
-- ✅ Income and expense tracking
-- ✅ Financial health indicators
-- ✅ Recent transactions display
-- ✅ Savings rate calculation
+- Total balance overview
+- Income and expense tracking
+- Financial health indicators
+- Recent transactions display
+- Savings rate calculation
 
 ### Transaction Management
-- ✅ Add new transactions
-- ✅ View all transactions
-- ✅ Search & filter transactions
-- ✅ Delete transactions
-- ✅ Category-based organization
+- Add new transactions
+- View all transactions
+- Search & filter transactions
+- Delete transactions
+- Category-based organization
 
 ### Category Insights
-- ✅ Expense category breakdown
-- ✅ Income category breakdown
-- ✅ Visual progress bars
-- ✅ Top spending categories
-- ✅ Category averages
+- Expense category breakdown
+- Income category breakdown
+- Visual progress bars
+- Top spending categories
+- Category averages
 
 ### Financial Reports
-- ✅ Monthly trend visualization
-- ✅ Bar chart for income vs expenses
-- ✅ Monthly breakdown table
-- ✅ Net savings calculation
-- ✅ Savings rate per month
+- Monthly trend visualization
+- Bar chart for income vs expenses
+- Monthly breakdown table
+- Net savings calculation
+- Savings rate per month
 
-### Help & Tips
-- ✅ App usage instructions
-- ✅ Financial best practices
-- ✅ 50/30/20 budget rule
-- ✅ Savings tips
+Help & Tips
+- App usage instructions
+- Financial best practices
+- 50/30/20 budget rule
+- Savings tips
 
-## 💾 Data Persistence
+Data Persistence
 
 All data is stored locally using browser `localStorage`:
 - `finomic_user` - Current user information
 - `finomic_transactions` - All transaction data
 - `finomic_pending_email` - Temporary storage for email verification
 
-## 🎨 Design
+Design
 
 - **Dark theme** with modern aesthetics
 - **Fully responsive** design for mobile and desktop
@@ -102,7 +102,7 @@ All data is stored locally using browser `localStorage`:
 - **Gradient accents** for visual appeal
 - **Professional** card-based layout
 
-## 🌐 Deployment
+**Deployment**
 
 To deploy this application:
 
@@ -117,7 +117,7 @@ To deploy this application:
 
 3. **Local Testing**: Simply open `index.html` in any modern web browser
 
-## 📱 Responsive Design
+Responsive Design
 
 The application is fully responsive with breakpoints at:
 - Mobile: < 768px
@@ -129,7 +129,7 @@ Mobile features:
 - Optimized layouts
 - Mobile menu overlay
 
-## 👥 Team Members
+Team Members
 
 - Tatiana Muniz Rodriguez
 - Diogo Barros
@@ -137,30 +137,30 @@ Mobile features:
 - Effy
 - Edith
 
-## 📝 Course Information
+Course Information
 
 **Course**: CISC3003 Web Programming  
 **Group**: 03  
-**Year**: 2024
+**Year**: 2026
 
-## 🔧 Technologies Used
+Technologies Used
 
-- **HTML5** - Structure
-- **CSS3** - Styling (no frameworks)
-- **JavaScript (ES6)** - Functionality (vanilla JS, no frameworks)
-- **localStorage** - Data persistence
+- HTML5 - Structure
+- CSS3 - Styling (no frameworks)
+- JavaScript (ES6) - Functionality (vanilla JS, no frameworks)
+- localStorage - Data persistence ###Change eventually when database is successfully implemented
 
-## 🎯 Course Requirements Met
+Course Requirements Met
 
-✅ Full-stack authentication system (signup, login, email verification, password reset)  
-✅ Responsive design for mobile and desktop  
-✅ Search and filter functionality  
-✅ Data persistence with localStorage  
-✅ Clean, organized file structure  
-✅ Modern UI/UX design  
-✅ No external frameworks (vanilla JS)  
-✅ Ready for deployment to web URL
+- Full-stack authentication system (signup, login, email verification, password reset)  
+- Responsive design for mobile and desktop  
+- Search and filter functionality  
+- Data persistence with localStorage  
+- Clean, organized file structure  
+- Modern UI/UX design  
+- No external frameworks (vanilla JS)  
+- Ready for deployment to web URL
 
 ---
 
-**Made with ❤️ for CISC3003 Web Programming Course**
+**Made for CISC3003 Web Programming Course**
