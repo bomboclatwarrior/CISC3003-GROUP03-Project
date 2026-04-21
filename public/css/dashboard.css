@@ -1,4 +1,4 @@
-/* ======================== DASHBOARD PAGE STYLES ======================== */
+/* Dashboard Grid Layout */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -6,11 +6,10 @@
     margin-bottom: 40px;
 }
 
+/* Statistic Card - Uses theme variables for light/dark mode */
 .stat-card {
-    /* 增强玻璃拟态 + 细微纹理 */
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: 24px;
     padding: 28px;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -18,7 +17,6 @@
     overflow: hidden;
 }
 
-/* 新增：卡片背景细微光效纹理 */
 .stat-card::before {
     content: "";
     position: absolute;
@@ -26,30 +24,33 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 80%);
+    background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 80%);
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none;
 }
 
+/* Hover Effect for Stat Card */
 .stat-card:hover {
     transform: translateY(-8px);
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(16, 185, 129, 0.3);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card:hover::before {
     opacity: 1;
 }
 
+/* Gradient Highlight Card - Fixed color, no theme change */
 .stat-card.gradient {
-    background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+    background: linear-gradient(135deg, #98e5db 0%, #06b6d4 100%);
     border: none;
     position: relative;
     overflow: hidden;
 }
 
+/* Shimmer Animation for Gradient Card */
 .stat-card.gradient::after {
     content: '';
     position: absolute;
@@ -62,19 +63,20 @@
     animation: gradientShimmer 8s infinite linear;
 }
 
-/* 新增：渐变光效动画 */
 @keyframes gradientShimmer {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
+/* White text for gradient card (fixed) */
 .stat-card.gradient h3, 
 .stat-card.gradient p {
-    color: #000;
+    color: #fff;
     position: relative;
     z-index: 1;
 }
 
+/* Stat Card Header Style */
 .stat-header {
     display: flex;
     align-items: center;
@@ -82,11 +84,16 @@
     margin-bottom: 16px;
 }
 
+/* 🔥 唯一修改：修复 Total Income/Expenses 文字颜色，适配双模式 */
+.stat-header p {
+    color: var(--text-primary);
+}
+
+/* Icon Pulse Animation */
 .stat-header .icon {
     width: 24px;
     height: 24px;
     stroke-width: 1.5;
-    /* 新增：图标呼吸动画 */
     animation: iconPulse 3s infinite ease-in-out;
 }
 
@@ -95,37 +102,36 @@
     50% { transform: scale(1.1); opacity: 1; }
 }
 
+/* Main number text - theme variable for light/dark mode */
 .stat-card h3 {
     font-size: 36px;
     font-weight: 800;
     margin-bottom: 8px;
     letter-spacing: -1px;
-    /* 新增：数字渐变文字 */
-    background: linear-gradient(to right, #fff, #e5e7eb);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--text-primary);
 }
 
+/* Gradient card number style */
 .stat-card.gradient h3 {
-    background: linear-gradient(to right, #000, #1f2937);
+    background: linear-gradient(to right, #fff, #f3f4f6);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
 }
 
+/* Secondary text - theme variable for light/dark mode */
 .stat-date, .stat-info {
     font-size: 14px;
-    color: #9ca3af;
+    color: var(--text-secondary);
     transition: all 0.3s ease;
 }
 
 .stat-card:hover .stat-date,
 .stat-card:hover .stat-info {
-    color: #d1d5db;
+    color: var(--text-primary);
 }
 
-/* Overview Grid */
+/* Overview Section Grid */
 .overview-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -133,28 +139,31 @@
     margin-bottom: 40px;
 }
 
+/* Content Card - theme variables applied */
 .card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: 24px;
     padding: 32px;
     transition: all 0.3s ease;
 }
 
 .card:hover {
-    border-color: rgba(16, 185, 129, 0.2);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-color: var(--border-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* Card Title - theme variable */
 .card h4 {
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 24px;
     position: relative;
     padding-bottom: 12px;
+    color: var(--text-primary);
 }
 
-/* 新增：标题下划线装饰 */
+/* Title Decorative Line */
 .card h4::after {
     content: "";
     position: absolute;
@@ -162,10 +171,11 @@
     bottom: 0;
     width: 40px;
     height: 2px;
-    background: linear-gradient(to right, #10b981, #06b6d4);
+    background: linear-gradient(to right, #98e5db, #06b6d4);
     border-radius: 2px;
 }
 
+/* Overview Stats Layout */
 .overview-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -174,7 +184,6 @@
 }
 
 .overview-item {
-    /* 新增：给每个统计项添加flex布局，让数字和文字垂直居中对齐 */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -182,14 +191,15 @@
     text-align: center;
 }
 
+/* Circular Stat Icon */
 .overview-circle {
     width: 72px;
     height: 72px;
     border-radius: 20px; 
     display: flex;
-    align-items: center; /* 数字在圆形框内垂直居中 */
-    justify-content: center; /* 数字在圆形框内水平居中 */
-    margin: 0 auto 12px; /* 保持底部间距，auto让圆形框水平居中 */
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
     font-size: 24px;
     font-weight: 700;
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -197,7 +207,6 @@
     overflow: hidden;
 }
 
-/* 新增：圆形背景光效 */
 .overview-circle::before {
     content: "";
     position: absolute;
@@ -205,50 +214,51 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, transparent 70%);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .overview-item:hover .overview-circle {
     transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .overview-item:hover .overview-circle::before {
     opacity: 1;
 }
 
+/* Circular Stat Color Variants */
 .overview-circle.teal {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
-    color: #10b981;
+    color: #98e5db;
 }
 
 .overview-circle.green {
     background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
-    color: #22c55e;
+    color: #98e5db;
 }
 
 .overview-circle.red {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
-    color: #ef4444;
+    color: #eeb58f;
 }
 
+/* Overview Item Text - theme variable */
 .overview-item p {
     font-size: 12px;
-    color: #9ca3af;
+    color: var(--text-secondary);
     transition: color 0.3s ease;
-    /* 新增：确保文字不换行，且居中 */
     white-space: nowrap;
     text-align: center;
     width: 100%;
 }
 
 .overview-item:hover p {
-    color: #fff;
+    color: var(--text-primary);
 }
 
-/* Health Stats */
+/* Financial Health Stats */
 .health-stats {
     display: flex;
     flex-direction: column;
@@ -262,20 +272,26 @@
     font-size: 14px;
 }
 
+/* Health Header Text - theme variables */
 .health-header span:first-child {
-    color: #9ca3af;
+    color: var(--text-secondary);
 }
 
-/* Progress Bar Shine */
+.health-header span:last-child {
+    color: var(--text-primary);
+}
+
+/* Progress Bar - theme variable for background */
 .progress-bar {
     height: 10px;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--bg-tertiary);
     border-radius: 10px;
     overflow: hidden;
     margin-top: 10px;
     position: relative;
 }
 
+/* Progress Bar Shine Animation */
 .progress-bar::before {
     content: "";
     position: absolute;
@@ -283,7 +299,7 @@
     left: -100%;
     width: 50%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.2), transparent);
     animation: progressShine 2s infinite linear;
 }
 
@@ -292,6 +308,7 @@
     100% { left: 200%; }
 }
 
+/* Progress Fill Style */
 .progress-fill {
     height: 100%;
     border-radius: 10px;
@@ -300,36 +317,37 @@
 }
 
 .progress-fill.gradient {
-    background: linear-gradient(to right, #10b981, #3b82f6);
+    background: linear-gradient(to right, #98e5db, #3b82f6);
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
 }
 
 .progress-fill.red {
-    background: linear-gradient(to right, #ef4444, #f87171);
+    background: linear-gradient(to right, #eeb58f, #f87171);
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
 }
 
-/* Transactions List */
+/* Transactions List Container */
 .transactions-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
+/* Transaction Item - theme variables applied */
 .transaction-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.01);
-    border: 1px solid rgba(255, 255, 255, 0.03);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     position: relative;
     overflow: hidden;
 }
 
-/* 新增：交易项左侧渐变边框 */
+/* Transaction Item Left Border Indicator */
 .transaction-item::before {
     content: "";
     position: absolute;
@@ -337,26 +355,28 @@
     top: 0;
     height: 100%;
     width: 4px;
-    background: linear-gradient(to bottom, #10b981, #06b6d4);
+    background: linear-gradient(to bottom, #98e5db, #06b6d4);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .transaction-item.expense::before {
-    background: linear-gradient(to bottom, #ef4444, #f87171);
+    background: linear-gradient(to bottom, #eeb58f, #f87171);
 }
 
+/* Transaction Item Hover Effect */
 .transaction-item:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
     transform: scale(1.01);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .transaction-item:hover::before {
     opacity: 1;
 }
 
+/* Transaction Icon Style */
 .transaction-icon {
     width: 48px;
     height: 48px;
@@ -371,51 +391,238 @@
     transform: scale(1.1);
 }
 
+/* Income/Expense Icon Colors */
 .transaction-icon.income {
     background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
-    color: #22c55e;
+    color: #98e5db;
 }
 
 .transaction-icon.expense {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
-    color: #ef4444;
+    color: #eeb58f;
 }
 
+/* Transaction Title - theme variable */
 .transaction-info h5 {
     font-size: 15px;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-primary);
     transition: color 0.3s ease;
 }
 
 .transaction-item:hover .transaction-info h5 {
-    color: #10b981;
+    color: #98e5db;
 }
 
 .transaction-item.expense:hover .transaction-info h5 {
-    color: #ef4444;
+    color: #eeb58f;
 }
 
+/* Transaction Date - theme variable */
 .transaction-info p {
     font-size: 12px;
-    color: #9ca3af;
+    color: var(--text-muted);
 }
 
+/* Transaction Amount - theme variable */
 .transaction-amount {
     font-size: 16px;
     font-weight: 700;
+    color: var(--text-primary);
     transition: all 0.3s ease;
+}
+
+/* Expense Amount Red (fixed) */
+.transaction-item.expense .transaction-amount {
+    color: #ef4444;
 }
 
 .transaction-item:hover .transaction-amount {
     transform: translateX(-4px);
 }
 
-/* Responsive */
+/* Responsive Mobile Styles */
 @media (max-width: 768px) {
     .overview-grid { grid-template-columns: 1fr; }
     .stat-card { padding: 20px; }
     .card { padding: 24px; }
     .overview-stats { gap: 16px; }
     .overview-circle { width: 64px; height: 64px; }
+}
+
+/* ========== 深色Overview卡片样式（匹配图片UI） ========== */
+.overview-dark-card {
+    background-color: #1a1a1a !important; /* 深色卡片背景 */
+    color: #ffffff !important; /* 白色文字 */
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+/* 标题行：Overview + 月份 */
+.overview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.overview-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+}
+.overview-month {
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+/* 顶部三个数据 */
+.overview-top-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+.overview-stat .stat-number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+.overview-stat p {
+    margin: 0;
+    color: #aaa;
+    font-size: 0.85rem;
+}
+
+/* 日历组件 */
+.overview-calendar {
+    margin-top: 1rem;
+}
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.3rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    color: #777;
+    font-size: 0.8rem;
+}
+.calendar-dates {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.3rem;
+}
+.date-item {
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #ddd;
+    cursor: default;
+}
+.date-item.active {
+    background-color: #ffb79f; /* 高亮日期的浅橙色背景，和图片一致 */
+    color: #1a1a1a; /* 深色文字，保证可读性 */
+    font-weight: 500;
+}
+.date-item:hover:not(.active) {
+    background-color: #2a2a2a;
+}
+
+/* 适配你原来的网格布局 */
+.overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* 深色 Overview 卡片 */
+.overview-dark-card {
+  background: #151823;
+  color: #fff;
+  border-radius: 16px;
+  padding: 20px;
+}
+.overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.overview-month {
+  color: #8a8d99;
+  font-size: 14px;
+}
+.overview-top-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.overview-stat .stat-number {
+  font-size: 22px;
+  font-weight: 600;
+}
+.overview-stat p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #8a8d99;
+}
+
+/* 日历布局 */
+.overview-calendar {
+  width: 100%;
+}
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 12px;
+  color: #8a8d99;
+  margin-bottom: 8px;
+}
+.calendar-dates {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.date-item {
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  border-radius: 6px;
+  position: relative;
+  cursor: default;
+}
+.date-item.empty {
+  background: transparent;
+}
+
+/* 标记圆点：收入青色 / 支出红色 */
+.date-item.income::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #98e5db; /* 青色 */
+}
+.date-item.expense::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #eeb58f; /* 红色 */
+}
+/* 同一天既有收入又有支出 */
+.date-item.income.expense::after {
+  background: #98e5db;
+  box-shadow: 8px 0 0 #eeb58f;
 }
