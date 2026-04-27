@@ -133,11 +133,11 @@ function updateRecentTransactions() {
                 <div class="transaction-amount ${t.type === 'income' ? 'green' : 'red'}">
                     ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
                 </div>
-                ${t.method ? `<div class="transaction-method">${t.method}</div>` : ''}
+             <!--   ${t.method ? `<div class="transaction-method">${t.method}</div>` : ''} -->
             </div>
         </div>
     `).join('');
-}
+} //REMINDER TO FIX THE TRANSACTION METHOD SO IT DOESN'T SHOW ONLY "API" , the last div is commented out in html.
 
 function getMonthName(date) {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
