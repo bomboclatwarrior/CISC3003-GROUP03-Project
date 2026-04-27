@@ -22,7 +22,7 @@ jobs:
 
       - name: Add upstream & fetch
         run: |
-          git remote add upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPO.git
+          git remote add upstream https://github.com/bomboclatwarrior/CISC3003-GROUP03-Project.git
           git fetch upstream
 
       - name: Checkout default branch (replace 'main' if yours is 'master')
