@@ -148,9 +148,11 @@ function renderTransactionCalendar() {
     const currentYear = today.getFullYear();
     const currentMonth = today.getMonth();
     const container = document.getElementById('calendar-dates-container');
-    const monthLabel = document.getElementById('overview-current-month');
+    const calendarMonthLabel = document.getElementById('calendar-current-month');
+    const overviewMonthLabel = document.getElementById('overview-current-month');
 
-    monthLabel.textContent = getMonthName(today);
+    calendarMonthLabel.textContent = getMonthName(today);
+    overviewMonthLabel.textContent = getMonthName(today);
     container.innerHTML = '';
 
     const currentMonthTransactions = transactions.filter(t => {
