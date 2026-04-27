@@ -11,6 +11,7 @@ let cachedExpenses = [];
 const CACHE_KEY_INCOMES = 'finomic_cache_incomes';
 const CACHE_KEY_EXPENSES = 'finomic_cache_expenses';
 const CACHE_TIMESTAMP_KEY = 'finomic_cache_timestamp';
+const CACHE_KEY_USER = 'finomic_cache_user';
 const CACHE_MAX_AGE = 30 * 60 * 1000; // 30 minutos
 
 function persistCache() {
@@ -43,6 +44,7 @@ function clearPersistedCache() {
     localStorage.removeItem(CACHE_KEY_INCOMES);
     localStorage.removeItem(CACHE_KEY_EXPENSES);
     localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+    localStorage.removeItem(CACHE_KEY_USER);
 }
 
 export function getCachedIncomes() {
@@ -54,10 +56,14 @@ export function getCachedExpenses() {
 }
 
 export async function loadInitialCache(userEmail) {
-    if (loadPersistedCache() && cachedIncomes.length > 0) {
-        console.log('📦 Using persisted cache');
+    const cachedUser = localStorage.getItem(CACHE_KEY_USER);
+    
+    if (cachedUser === userEmail && loadPersistedCache() && cachedIncomes.length > 0) {
+        console.log('📦 Using persisted cache for', userEmail);
         return;
     }
+    
+    clearPersistedCache();
     
     console.log('🌐 Loading initial cache from API...');
     const userName = userEmail.split('@')[0];
@@ -74,6 +80,7 @@ export async function loadInitialCache(userEmail) {
         console.log(`📦 Loaded ${cachedExpenses.length} expenses`);
     }
     
+    localStorage.setItem(CACHE_KEY_USER, userEmail);
     persistCache();
 }
 
