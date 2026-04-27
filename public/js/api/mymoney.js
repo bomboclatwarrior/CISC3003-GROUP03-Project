@@ -1,6 +1,3 @@
-// public/js/api/mymoney.js
-// VERSÃO COMPLETA COM CACHE
-
 const API_URL = window.location.hostname === 'localhost' 
     ? '/api'  // Proxy do Vite
     : import.meta.env.VITE_MY_MONEY_API_URL;
@@ -132,8 +129,6 @@ export async function deleteExpenseAndUpdateCache(id) {
     return result;
 }
 
-// ========== LEITURA DO CACHE (PARA DASHBOARD, CATEGORIES, REPORTS) ==========
-
 export async function getUserIncomesFromCache(userEmail) {
     const userName = userEmail.split('@')[0];
     const filteredData = cachedIncomes.filter(item => item.user === userName);
@@ -195,7 +190,7 @@ export async function getUserStatementFromCache(userEmail, year, month) {
     };
 }
 
-// ========== FUNÇÕES BASE (REQUEST E CRUD ORIGINAIS) ==========
+// ========== REQUEST ==========
 
 async function request(endpoint, options = {}) {
     const url = `${API_URL}${endpoint}`;
@@ -234,7 +229,6 @@ async function request(endpoint, options = {}) {
 }
 
 // ========== INCOMES ==========
-
 export async function getAllIncomes() {
     const result = await request('/income');
     if (result.ok) {
@@ -314,7 +308,6 @@ export async function deleteIncome(id) {
 }
 
 // ========== EXPENSES ==========
-
 export async function getAllExpenses() {
     const result = await request('/expenses');
     if (result.ok) {
@@ -404,7 +397,6 @@ export async function deleteExpense(id) {
 }
 
 // ========== STATEMENT ==========
-
 export async function getMonthlyStatement(year, month, userEmail) {
     const userName = userEmail.split('@')[0];
     const result = await request(`/statement/${year}/${month}?user=${userName}`);
@@ -414,8 +406,7 @@ export async function getMonthlyStatement(year, month, userEmail) {
     return { success: false, error: result.error, status: result.status, fullResponse: result };
 }
 
-// ========== FUNÇÕES FILTRADAS POR USUÁRIO (ORIGINAIS - MANTIDAS) ==========
-
+// ========== FILTERED FUNCTIONS ==========
 export async function getUserIncomes(userEmail) {
     const userName = userEmail.split('@')[0];
     const result = await getAllIncomes();

@@ -4,9 +4,7 @@ export const categories = {
 };
 
 
-// Mapeamento de categorias do frontend (inglês) para a API (português)
 export const categoryMappingToAPI = {
-    // Expense categories (inglês -> português)
     'Rent': 'Moradia',
     'Groceries': 'Alimentação',
     'Utilities': 'Moradia',
@@ -16,7 +14,6 @@ export const categoryMappingToAPI = {
     'Shopping': 'Outras',
     'Other': 'Outras',
     
-    // Income categories (inglês -> português)
     'Salary': 'Salário',
     'Freelance': 'Freelance',
     'Investment': 'Investimento',
@@ -24,7 +21,6 @@ export const categoryMappingToAPI = {
     'Other Income': 'Outras Receitas'
 };
 
-// Mapeamento reverso (português -> inglês) para exibição
 export const categoryMappingToFrontend = {
     // Expense categories
     'Moradia': 'Rent',
@@ -42,7 +38,6 @@ export const categoryMappingToFrontend = {
     'Outras Receitas': 'Other Income'
 };
 
-// Função para converter categoria do frontend para API
 export function mapCategoryToAPI(category, type) {
     if (type === 'expense') {
         const mapping = {
@@ -68,7 +63,6 @@ export function mapCategoryToAPI(category, type) {
     }
 }
 
-// Função para converter categoria da API para frontend
 export function mapCategoryToFrontend(apiCategory, type) {
     if (type === 'expense') {
         const mapping = {
