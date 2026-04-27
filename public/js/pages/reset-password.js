@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const oobCode = getParameterByName('oobCode');
     const mode = getParameterByName('mode');
 
-    // Se não veio token via URL, instruir usuário
     if (!oobCode || mode !== 'resetPassword') {
         showError('Link inválido ou expirado. Solicite um novo reset de senha.');
         document.getElementById('reset-form').style.display = 'none';

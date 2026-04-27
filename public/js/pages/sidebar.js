@@ -3,21 +3,50 @@ import { getCurrentUser, signOut, onAuthChange } from '../firebase/auth.js';
 function initializeMobileMenu() {
     const menuBtn = document.getElementById('mobile-menu-btn');
     const sidebar = document.getElementById('sidebar');
-    const overlay = document.querySelector('.sidebar-overlay');
+
+    let overlay = document.querySelector('.sidebar-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+    }
 
     if (!menuBtn || !sidebar) return;
 
-    menuBtn.addEventListener('click', () => {
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // 防止事件冒泡
         sidebar.classList.toggle('open');
-        if (overlay) overlay.classList.toggle('active');
+        overlay.classList.toggle('active');
+
+        menuBtn.innerHTML = sidebar.classList.contains('open') 
+            ? '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>'
+            : '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+
+        document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
     });
 
-    if (overlay) {
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-        });
-    }
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+
+        menuBtn.innerHTML = '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+        document.body.style.overflow = ''; // 恢复滚动
+    });
+
+    const navLinks = sidebar.querySelectorAll('.nav-item');
+    navLinks.forEach(link => {
+        if (link.tagName === 'A') {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                    menuBtn.innerHTML = '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,7 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!sidebarContainer) return;
 
     onAuthChange((user) => {
-        if (!user) return; // não renderiza sidebar se não estiver logado
+        if (!user) {
+            sidebarContainer.style.display = 'none';
+            return;
+        }
+
+        sidebarContainer.style.display = 'block';
         const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
         
         sidebarContainer.innerHTML = `
@@ -78,7 +112,18 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
         `;
 
-        document.getElementById('signout-btn')?.addEventListener('click', signOut);
+        const signoutBtn = document.getElementById('signout-btn');
+        if (signoutBtn) {
+            signoutBtn.addEventListener('click', async () => {
+                try {
+                    await signOut();
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('Sign out error:', error);
+                }
+            });
+        }
+
         initializeMobileMenu();
     });
 });

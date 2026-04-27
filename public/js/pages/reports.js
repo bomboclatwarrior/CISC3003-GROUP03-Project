@@ -11,11 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             currentUser = user;
-            
-            // Garantir que cache está carregado
             await loadInitialCache(currentUser.email);
-            
-            // Carregar transações do cache
             await loadTransactionsFromCache();
             updateReports();
         } else {
@@ -25,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 async function loadTransactionsFromCache() {
+    if (!currentUser) return;
+    
     const userEmail = currentUser.email;
     
     try {
@@ -34,9 +32,9 @@ async function loadTransactionsFromCache() {
         const incomes = (incomesResult.success ? incomesResult.data : []).map(inc => ({
             id: inc._id,
             type: 'income',
-            amount: inc.amount,
+            amount: parseFloat(inc.amount) || 0,
             category: inc.category || 'Salary',
-            description: inc.description,
+            description: inc.description || '',
             date: inc.date.split('T')[0],
             method: 'API'
         }));
@@ -44,9 +42,9 @@ async function loadTransactionsFromCache() {
         const expenses = (expensesResult.success ? expensesResult.data : []).map(exp => ({
             id: exp._id,
             type: 'expense',
-            amount: exp.amount,
+            amount: parseFloat(exp.amount) || 0,
             category: mapCategoryToFrontend(exp.category, 'expense') || 'Other',
-            description: exp.description,
+            description: exp.description || '',
             date: exp.date.split('T')[0],
             method: 'API'
         }));
@@ -82,12 +80,21 @@ function updateMonthlyBreakdown() {
     const monthlyData = {};
 
     transactions.forEach(t => {
+        if (t.amount <= 0) return;
+        
         const date = new Date(t.date);
+        if (isNaN(date.getTime())) return;
+        
         const monthKey = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
         const monthName = date.toLocaleString('default', { month: 'short', year: 'numeric' });
 
         if (!monthlyData[monthKey]) {
-            monthlyData[monthKey] = { month: monthName, income: 0, expenses: 0, date: date };
+            monthlyData[monthKey] = { 
+                month: monthName, 
+                income: 0, 
+                expenses: 0, 
+                date: date 
+            };
         }
 
         if (t.type === 'income') {
@@ -99,12 +106,17 @@ function updateMonthlyBreakdown() {
 
     const sortedData = Object.values(monthlyData).sort((a, b) => a.date - b.date);
 
-    // Chart
+    renderMonthlyChart(sortedData);
+    
+    renderMonthlyTable(sortedData);
+}
+
+function renderMonthlyChart(sortedData) {
     const chartCard = document.getElementById('chart-card');
     const chartContainer = document.getElementById('chart-container');
 
     if (sortedData.length > 0) {
-        chartCard.style.display = '';
+        chartCard.style.display = 'block';
         const maxVal = Math.max(...sortedData.map(s => Math.max(s.income, s.expenses)));
         const maxValue = maxVal === 0 ? 1 : maxVal;
 
@@ -114,8 +126,8 @@ function updateMonthlyBreakdown() {
             return `
                 <div class="chart-bar-group">
                     <div class="chart-bars">
-                        <div class="chart-bar-income" style="height:${Math.max(incomeHeight, 2)}%;"></div>
-                        <div class="chart-bar-expense" style="height:${Math.max(expenseHeight, 2)}%;"></div>
+                        <div class="chart-bar-income" style="height:${Math.max(incomeHeight, 2)}%;" title="Income: ${formatCurrency(d.income)}"></div>
+                        <div class="chart-bar-expense" style="height:${Math.max(expenseHeight, 2)}%;" title="Expenses: ${formatCurrency(d.expenses)}"></div>
                     </div>
                     <span class="chart-bar-label">${d.month}</span>
                 </div>
@@ -124,7 +136,9 @@ function updateMonthlyBreakdown() {
     } else {
         chartCard.style.display = 'none';
     }
+}
 
+function renderMonthlyTable(sortedData) {
     const tbody = document.getElementById('monthly-table-body');
 
     if (sortedData.length === 0) {
@@ -132,7 +146,7 @@ function updateMonthlyBreakdown() {
     } else {
         tbody.innerHTML = sortedData.map(data => {
             const net = data.income - data.expenses;
-            const savingsRate = data.income > 0 ? (net / data.income) * 100 : 0;
+            const savingsRate = data.income > 0 ? ((net / data.income) * 100) : 0;
 
             return `
                 <tr>
