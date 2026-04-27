@@ -42,25 +42,43 @@ async function loadTransactionsFromCache() {
         const incomesResult = await getUserIncomesFromCache(userEmail);
         const expensesResult = await getUserExpensesFromCache(userEmail);
         
-        const incomes = (incomesResult.success && incomesResult.data ? incomesResult.data : []).map(inc => ({
-            id: inc._id,
-            type: 'income',
-            amount: inc.amount,
-            category: inc.category || 'Salary',
-            description: inc.description,
-            date: inc.date.split('T')[0],
-            method: 'API'
-        }));
+        const incomes = (incomesResult.success && incomesResult.data ? incomesResult.data : [])
+        .map(inc => {
+            const id = inc._id || inc.id;
+            if (!id) {
+                console.warn('Income missing id, skipping:', inc);
+                return null;
+            }
+            return {
+                id: id,
+                type: 'income',
+                amount: inc.amount,
+                category: mapCategoryToFrontend(inc.category, 'income') || 'Salary',
+                description: inc.description,
+                date: inc.date ? inc.date.split('T')[0] : '',
+                method: 'API'
+            };
+        })
+        .filter(inc => inc !== null);
         
-        const expenses = (expensesResult.success && expensesResult.data ? expensesResult.data : []).map(exp => ({
-            id: exp._id,
-            type: 'expense',
-            amount: exp.amount,
-            category: mapCategoryToFrontend(exp.category, 'expense') || 'Other',
-            description: exp.description,
-            date: exp.date.split('T')[0],
-            method: 'API'
-        }));
+        const expenses = (expensesResult.success && expensesResult.data ? expensesResult.data : [])
+        .map(exp => {
+            const id = exp._id || exp.id;
+            if (!id) {
+                console.warn('Expense missing id, skipping:', exp);
+                return null;
+            }
+            return {
+                id: id,
+                type: 'expense',
+                amount: exp.amount,
+                category: mapCategoryToFrontend(exp.category, 'expense') || 'Other',
+                description: exp.description,
+                date: exp.date ? exp.date.split('T')[0] : '',
+                method: 'API'
+            };
+        })
+        .filter(exp => exp !== null);
         
         transactions = [...incomes, ...expenses];
         transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -82,11 +100,13 @@ async function addTransactionToAPI(transaction) {
     let result;
     
     if (transaction.type === 'income') {
+        const categoryInPortuguese = mapCategoryToAPI(transaction.category, 'income');
         result = await addIncomeAndUpdateCache({
             user: userName,
             description: transaction.description,
             amount: transaction.amount,
-            date: transaction.date
+            date: transaction.date,
+            category: categoryInPortuguese 
         });
     } else {
         const categoryInPortuguese = mapCategoryToAPI(transaction.category, 'expense');

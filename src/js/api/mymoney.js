@@ -64,13 +64,20 @@ export async function loadInitialCache(userEmail) {
     
     const incomesResult = await request('/income');
     if (incomesResult.ok) {
-        cachedIncomes = incomesResult.data.data.filter(item => item.user === userName);
+        let allIncomes = incomesResult.data.data.filter(item => item.user === userName);
+        // 保留有效 id 的记录（_id 或 id 存在且非 undefined）
+        cachedIncomes = allIncomes.filter(item => item._id || item.id);
+        const invalidCount = allIncomes.length - cachedIncomes.length;
+        if (invalidCount > 0) console.warn(`⚠️ Skipped ${invalidCount} incomes without valid _id`);
         console.log(`📦 Loaded ${cachedIncomes.length} incomes`);
     }
     
     const expensesResult = await request('/expenses');
     if (expensesResult.ok) {
-        cachedExpenses = expensesResult.data.data.filter(item => item.user === userName);
+        let allExpenses = expensesResult.data.data.filter(item => item.user === userName);
+        cachedExpenses = allExpenses.filter(item => item._id || item.id);
+        const invalidCount = allExpenses.length - cachedExpenses.length;
+        if (invalidCount > 0) console.warn(`⚠️ Skipped ${invalidCount} expenses without valid _id`);
         console.log(`📦 Loaded ${cachedExpenses.length} expenses`);
     }
     
@@ -90,6 +97,9 @@ export async function forceRefreshCache(userEmail) {
 export async function addIncomeAndUpdateCache(incomeData) {
     const result = await addIncome(incomeData);
     if (result.success && result.data) {
+        if (!result.data.category && incomeData.category) {
+            result.data.category = incomeData.category;
+        }
         cachedIncomes.push(result.data);
         persistCache();
         console.log(`📦 Cache updated: +1 income (total: ${cachedIncomes.length})`);
@@ -100,6 +110,9 @@ export async function addIncomeAndUpdateCache(incomeData) {
 export async function addExpenseAndUpdateCache(expenseData) {
     const result = await addExpense(expenseData);
     if (result.success && result.data) {
+        if (!result.data.category && expenseData.category) {
+            result.data.category = expenseData.category;
+        }
         cachedExpenses.push(result.data);
         persistCache();
         console.log(`📦 Cache updated: +1 expense (total: ${cachedExpenses.length})`);
