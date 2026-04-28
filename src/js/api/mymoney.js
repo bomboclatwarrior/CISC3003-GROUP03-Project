@@ -1,5 +1,5 @@
 const API_URL = window.location.hostname === 'localhost' 
-    ? '/api'  // Proxy do Vite
+    ? '/api'
     : import.meta.env.VITE_MY_MONEY_API_URL;
 const API_TOKEN = import.meta.env.VITE_MY_MONEY_API_AUTH;
 const API_AUTH = 'Basic ' + API_TOKEN;
@@ -12,13 +12,12 @@ const CACHE_KEY_INCOMES = 'finomic_cache_incomes';
 const CACHE_KEY_EXPENSES = 'finomic_cache_expenses';
 const CACHE_TIMESTAMP_KEY = 'finomic_cache_timestamp';
 const CACHE_KEY_USER = 'finomic_cache_user';
-const CACHE_MAX_AGE = 30 * 60 * 1000; // 30 minutos
+const CACHE_MAX_AGE = 30 * 60 * 1000;
 
 function persistCache() {
     localStorage.setItem(CACHE_KEY_INCOMES, JSON.stringify(cachedIncomes));
     localStorage.setItem(CACHE_KEY_EXPENSES, JSON.stringify(cachedExpenses));
     localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-    console.log('💾 Cache persisted');
 }
 
 function loadPersistedCache() {
@@ -31,7 +30,6 @@ function loadPersistedCache() {
         if (age < CACHE_MAX_AGE) {
             cachedIncomes = JSON.parse(savedIncomes);
             cachedExpenses = JSON.parse(savedExpenses);
-            console.log(`📦 Cache restored: ${cachedIncomes.length} incomes, ${cachedExpenses.length} expenses`);
             return true;
         } else {
             clearPersistedCache();
@@ -59,26 +57,24 @@ export async function loadInitialCache(userEmail) {
     const cachedUser = localStorage.getItem(CACHE_KEY_USER);
     
     if (cachedUser === userEmail && loadPersistedCache() && cachedIncomes.length > 0) {
-        console.log('📦 Using persisted cache for', userEmail);
         return;
     }
     
     clearPersistedCache();
     
-    console.log('🌐 Loading initial cache from API...');
     const userName = userEmail.split('@')[0];
     
     const incomesResult = await request('/income');
     if (incomesResult.ok) {
         cachedIncomes = incomesResult.data.data.filter(item => item.user === userName);
-        console.log(`📦 Loaded ${cachedIncomes.length} incomes`);
     }
-    
+
+
     const expensesResult = await request('/expenses');
     if (expensesResult.ok) {
         cachedExpenses = expensesResult.data.data.filter(item => item.user === userName);
-        console.log(`📦 Loaded ${cachedExpenses.length} expenses`);
     }
+
     
     localStorage.setItem(CACHE_KEY_USER, userEmail);
     persistCache();
@@ -89,17 +85,15 @@ export async function forceRefreshCache(userEmail) {
     cachedIncomes = [];
     cachedExpenses = [];
     await loadInitialCache(userEmail);
-    console.log('🔄 Cache force refreshed');
 }
 
-// ========== FUNÇÕES COM CACHE (PARA ADD/DELETE) ==========
+// ========== CACHE FUNCTIONS ==========
 
 export async function addIncomeAndUpdateCache(incomeData) {
     const result = await addIncome(incomeData);
     if (result.success && result.data) {
         cachedIncomes.push(result.data);
         persistCache();
-        console.log(`📦 Cache updated: +1 income (total: ${cachedIncomes.length})`);
     }
     return result;
 }
@@ -109,7 +103,6 @@ export async function addExpenseAndUpdateCache(expenseData) {
     if (result.success && result.data) {
         cachedExpenses.push(result.data);
         persistCache();
-        console.log(`📦 Cache updated: +1 expense (total: ${cachedExpenses.length})`);
     }
     return result;
 }
@@ -120,7 +113,8 @@ export async function deleteIncomeAndUpdateCache(id) {
         const removed = cachedIncomes.find(i => i._id === id);
         cachedIncomes = cachedIncomes.filter(i => i._id !== id);
         persistCache();
-        console.log(`📦 Cache updated: -1 income "${removed?.description}"`);
+    } else {
+        console.warn(`❌ Falha ao excluir receita ${id}:`, result.error || result.statusText);
     }
     return result;
 }
@@ -131,7 +125,8 @@ export async function deleteExpenseAndUpdateCache(id) {
         const removed = cachedExpenses.find(e => e._id === id);
         cachedExpenses = cachedExpenses.filter(e => e._id !== id);
         persistCache();
-        console.log(`📦 Cache updated: -1 expense "${removed?.description}"`);
+    } else {
+        console.warn(`❌ Falha ao excluir despesa ${id}:`, result.error || result.statusText);
     }
     return result;
 }
@@ -198,7 +193,6 @@ export async function getUserStatementFromCache(userEmail, year, month) {
 }
 
 // ========== REQUEST ==========
-
 async function request(endpoint, options = {}) {
     const url = `${API_URL}${endpoint}`;
     const headers = {
@@ -206,8 +200,6 @@ async function request(endpoint, options = {}) {
         'Authorization': API_AUTH,
         ...options.headers
     };
-
-    console.log(`📡 ${options.method || 'GET'} ${url}`);
 
     try {
         const response = await fetch(url, { ...options, headers });
@@ -221,7 +213,6 @@ async function request(endpoint, options = {}) {
             error: !response.ok ? data.error || data.message || `HTTP ${response.status}` : null
         };
 
-        console.log('📦 Response:', result);
         return result;
     } catch (networkError) {
         return {

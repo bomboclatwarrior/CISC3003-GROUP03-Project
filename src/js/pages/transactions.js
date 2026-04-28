@@ -15,17 +15,20 @@ import { categories, mapCategoryToAPI, mapCategoryToFrontend } from '../modules/
 let transactions = [];
 let currentUser = null;
 
+let pendingDeleteId = null;
+let pendingDeleteType = null;
+
 document.addEventListener('DOMContentLoaded', function () {
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             currentUser = user;
-            console.log('User logged in:', currentUser.email);
-            
+
             await loadInitialCache(currentUser.email);
             
             await loadTransactionsFromCache();
             initializeTransactionForm();
             initializeFilters();
+            initializeModal();
             updateTransactionsTable();
         } else {
             window.location.href = 'login.html';
@@ -36,8 +39,6 @@ document.addEventListener('DOMContentLoaded', function () {
 async function loadTransactionsFromCache() {
     const userEmail = currentUser.email;
     const userName = userEmail.split('@')[0];
-    console.log('Loading transactions from cache for user:', userName);
-    
     try {
         const incomesResult = await getUserIncomesFromCache(userEmail);
         const expensesResult = await getUserExpensesFromCache(userEmail);
@@ -65,10 +66,7 @@ async function loadTransactionsFromCache() {
         transactions = [...incomes, ...expenses];
         transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
         
-        console.log(`Loaded ${transactions.length} transactions from cache for user ${userName}`);
-        
     } catch (error) {
-        console.error('Error loading transactions from cache:', error);
         transactions = [];
     }
 }
@@ -76,8 +74,6 @@ async function loadTransactionsFromCache() {
 async function addTransactionToAPI(transaction) {
     const userEmail = currentUser.email;
     const userName = userEmail.split('@')[0];
-    console.log('Adding transaction for user:', userName);
-    console.log('Transaction data:', transaction);
     
     let result;
     
@@ -99,18 +95,69 @@ async function addTransactionToAPI(transaction) {
         });
     }
     
-    console.log('API result:', result);
     
     if (result.success) {
-        console.log('Transaction added, cache already updated');
-        // Recarregar do cache (já atualizado)
         await loadTransactionsFromCache();
         return true;
     } else {
-        console.error('Failed to add transaction:', result.error);
         alert('Error adding transaction: ' + result.error);
         return false;
     }
+}
+
+// ---------- DELETE CONFIRMATION MODAL ----------
+function initializeModal() {
+    const overlay = document.getElementById('delete-modal');
+    const cancelBtn = document.getElementById('delete-modal-cancel');
+    const confirmBtn = document.getElementById('delete-modal-confirm');
+
+    cancelBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal();
+    });
+
+    confirmBtn.addEventListener('click', async () => {
+        if (!pendingDeleteId || !pendingDeleteType) return;
+        
+        confirmBtn.disabled = true;
+        cancelBtn.disabled = true;
+        confirmBtn.textContent = 'Deleting...';
+        
+        const success = await deleteTransactionFromAPI(pendingDeleteId, pendingDeleteType);
+        
+        if (success) {
+            closeModal();
+            updateTransactionsTable();
+            updateFilterCategories();
+        } else {
+            closeModal();
+        }
+        
+        confirmBtn.disabled = false;
+        cancelBtn.disabled = false;
+        confirmBtn.textContent = 'Delete';
+    });
+}
+
+function openModal(id, type) {
+    pendingDeleteId = id;
+    pendingDeleteType = type;
+    document.getElementById('delete-modal').style.display = 'flex';
+}
+
+function closeModal() {
+    pendingDeleteId = null;
+    pendingDeleteType = null;
+    document.getElementById('delete-modal').style.display = 'none';
+}
+
+function showErrorToast(message) {
+    const toast = document.getElementById('error-toast');
+    toast.textContent = message;
+    toast.style.display = 'block';
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 4000);
 }
 
 function initializeTransactionForm() {
@@ -122,7 +169,6 @@ function initializeTransactionForm() {
     const dateInput = document.getElementById('transaction-date');
 
     if (!addBtn) {
-        console.error('Add button not found!');
         return;
     }
 
@@ -132,12 +178,10 @@ function initializeTransactionForm() {
     updateCategoryOptions();
 
     addBtn.addEventListener('click', function () {
-        console.log('Add button clicked');
         formContainer.style.display = 'block';
     });
 
     cancelBtn.addEventListener('click', function () {
-        console.log('Cancel button clicked');
         formContainer.style.display = 'none';
         form.reset();
         dateInput.value = new Date().toISOString().split('T')[0];
@@ -146,7 +190,6 @@ function initializeTransactionForm() {
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        console.log('Form submitted');
 
         const transaction = {
             type: document.getElementById('transaction-type').value,
@@ -157,8 +200,6 @@ function initializeTransactionForm() {
             description: document.getElementById('transaction-description').value
         };
 
-        console.log('Transaction to add:', transaction);
-
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Saving...';
@@ -167,7 +208,6 @@ function initializeTransactionForm() {
         const success = await addTransactionToAPI(transaction);
         
         if (success) {
-            console.log('Updating UI after successful add');
             updateTransactionsTable();
             updateFilterCategories();
             formContainer.style.display = 'none';
@@ -220,8 +260,6 @@ function updateFilterCategories() {
 }
 
 function updateTransactionsTable() {
-    console.log('Updating transactions table, total transactions:', transactions.length);
-    
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
     const filterType = document.getElementById('filter-type').value;
     const filterCategory = document.getElementById('filter-category').value;
@@ -234,8 +272,6 @@ function updateTransactionsTable() {
         const matchesCategory = filterCategory === 'all' || t.category === filterCategory;
         return matchesSearch && matchesType && matchesCategory;
     });
-
-    console.log('Filtered transactions:', filtered.length);
 
     const tbody = document.getElementById('transactions-table-body');
 
@@ -263,19 +299,24 @@ function updateTransactionsTable() {
         btn.addEventListener('click', async function() {
             const id = this.getAttribute('data-id');
             const type = this.getAttribute('data-type');
-            
-            if (confirm('Are you sure you want to delete this transaction?')) {
-                await deleteTransactionFromAPI(id, type);
-                updateTransactionsTable();
-                updateFilterCategories();
-            }
+
+            if (!id || id === 'undefined') {
+            showErrorToast('Cannot delete – invalid transaction ID.');
+            return;
+        }
+        
+        openModal(id, type);
         });
     });
 }
 
 async function deleteTransactionFromAPI(id, type) {
+    if (!id || id === 'undefined') {
+        showErrorToast('Invalid transaction ID.');
+        return false;
+    }
+
     let result;
-    
     if (type === 'income') {
         result = await deleteIncomeAndUpdateCache(id);
     } else {
@@ -283,12 +324,10 @@ async function deleteTransactionFromAPI(id, type) {
     }
     
     if (result.success) {
-        console.log('Transaction deleted, cache already updated');
         await loadTransactionsFromCache();
         return true;
     } else {
-        console.error('Failed to delete:', result.error);
-        alert('Error deleting: ' + result.error);
+        showErrorToast('Failed to delete: ' + result.error);
         return false;
     }
 }
