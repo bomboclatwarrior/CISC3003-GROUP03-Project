@@ -15,6 +15,7 @@ export default defineConfig({
         categories: resolve(__dirname, 'src/categories.html'),
         reports: resolve(__dirname, 'src/reports.html'),
         help: resolve(__dirname, 'src/help.html'),
+        signup: resolve(__dirname, 'src/signup.html'),
         'forgot-password': resolve(__dirname, 'src/forgot-password.html'),
         'reset-password': resolve(__dirname, 'src/reset-password.html'),
         'test-api': resolve(__dirname, 'src/test-api.html'),

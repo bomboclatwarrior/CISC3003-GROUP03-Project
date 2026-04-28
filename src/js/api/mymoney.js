@@ -250,7 +250,7 @@ export async function addIncome(incomeData) {
         if (!incomeData[field]) {
             return {
                 success: false,
-                error: `Campo '${field}' é obrigatório para criar uma receita.`,
+                error: `Field '${field}' is necessary to create receipt.`,
                 validationError: true
             };
         }
@@ -329,7 +329,7 @@ export async function addExpense(expenseData) {
         if (!expenseData[field]) {
             return {
                 success: false,
-                error: `Campo '${field}' é obrigatório para criar uma despesa.`,
+                error: `Field '${field}' is necessary for the receipt.`,
                 validationError: true
             };
         }

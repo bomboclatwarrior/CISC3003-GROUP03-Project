@@ -240,14 +240,14 @@ function updateTransactionsTable() {
     const tbody = document.getElementById('transactions-table-body');
 
     if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:48px 24px; color:#9ca3af;">No transactions found</td></tr>';
-    } else {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:48px 24px; color:#9ca3af;">No transactions found</td></tr>';
+    } else { // colspan changed from 7 to 6 to remove transaction method column
         tbody.innerHTML = filtered.map(t => `
             <tr>
                 <td>${formatDate(t.date)}</td>
                 <td><strong>${t.description}</strong></td>
                 <td>${t.category}</td>
-                <td style="color:#9ca3af;">${t.method || '-'}</td>
+             <!--   <td style="color:#9ca3af;">${t.method || '-'}</td> -->
                 <td><span class="type-badge ${t.type}">${getTransactionIcon(t.type)}${t.type}</span></td>
                 <td class="text-right ${t.type === 'income' ? 'green' : 'red'}">
                     ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
