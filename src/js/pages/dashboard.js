@@ -38,7 +38,7 @@ async function loadTransactionsFromCache() {
             category: inc.category || 'Salary',
             description: inc.description,
             date: inc.date.split('T')[0],
-            method: 'API'
+            method: inc.method || ''
         }));
         
         const expenses = (expensesResult.success ? expensesResult.data : []).map(exp => ({
@@ -48,7 +48,7 @@ async function loadTransactionsFromCache() {
             category: mapCategoryToFrontend(exp.category, 'expense') || 'Other',
             description: exp.description,
             date: exp.date.split('T')[0],
-            method: 'API'
+            method: exp.method || ''
         }));
         
         transactions = [...incomes, ...expenses];
